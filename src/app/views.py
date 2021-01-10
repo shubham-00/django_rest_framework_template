@@ -1,18 +1,30 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from .models import BlogPost
 from .serializers import BlogPostSerializer, RegistrationSerializer, LoginSerializer
 from django.contrib.auth.models import User
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.generics import ListAPIView
+from rest_framework.authentication import TokenAuthentication
+
+
+class ApiBlogListView(ListAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def api_detail_blog_view(request, slug):
-    print("Host:", request.headers.get("Host"))
     try:
         blog_post = BlogPost.objects.get(slug=slug)
 
@@ -25,12 +37,17 @@ def api_detail_blog_view(request, slug):
 
 
 @api_view(["PUT"])
+@permission_classes([IsAuthenticated])
 def api_update_blog_view(request, slug):
     try:
         blog_post = BlogPost.objects.get(slug=slug)
 
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+    if blog_post.author != user:
+        return Response({"response": "Access denied!!!"})
 
     if request.method == "PUT":
         serializer = BlogPostSerializer(blog_post, request.data)
@@ -46,12 +63,17 @@ def api_update_blog_view(request, slug):
 
 
 @api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
 def api_delete_blog_view(request, slug):
     try:
         blog_post = BlogPost.objects.get(slug=slug)
 
     except:
         return Response(status=status.HTTP_404_NOT_FOUND)
+
+    user = request.user
+    if blog_post.author != user:
+        return Response({"response": "Access denied!!!"})
 
     if request.method == "DELETE":
         operation = blog_post.delete()
@@ -66,11 +88,11 @@ def api_delete_blog_view(request, slug):
 
 
 @api_view(["POST"])
-# @parser_classes([MultiPartParser, FormParser, JSONParser])
+@permission_classes([IsAuthenticated])
 def api_create_blog_view(request):
     account = User.objects.get(pk=1)
 
-    blog_post = BlogPost(author=account)
+    blog_post = BlogPost(author=request.user)
 
     if request.method == "POST":
         serializer = BlogPostSerializer(blog_post, data=request.data)

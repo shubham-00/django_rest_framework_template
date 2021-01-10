@@ -7,6 +7,7 @@ from .views import (
     api_delete_blog_view,
     api_registration_view,
     api_login_view,
+    ApiBlogListView,
 )
 
 
@@ -14,6 +15,7 @@ app_name = "app"
 
 
 urlpatterns = [
+    path("", ApiBlogListView.as_view(), name="home"),
     path("create/", api_create_blog_view, name="create"),
     path("register/", api_registration_view, name="register"),
     # path("login/", obtain_auth_token, name="login"),

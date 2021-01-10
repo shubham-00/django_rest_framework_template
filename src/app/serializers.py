@@ -4,9 +4,14 @@ from django.contrib.auth.models import User
 
 
 class BlogPostSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField("get_author_name")
+
     class Meta:
         model = BlogPost
-        fields = ["title", "body", "image", "date_updated"]
+        fields = ["title", "body", "image", "date_updated", "author"]
+
+    def get_author_name(self, blog_post):
+        return blog_post.author.username
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
