@@ -38,17 +38,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return account
 
 
-"""
-{
-"email":"test@gmail.com",
-"username":"test",
-"password":"testing1234",
-"password2":"testing123"
-}
-"""
-
-
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "password"]
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["pk", "username", "email"]
