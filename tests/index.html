@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+	</head>
+	<body>
+		<input type="file" name="file" id="file" onchange="callme()" />
+
+		<script>
+			let formData = new FormData();
+			let blob = document.getElementById("file").files[0];
+
+			const callme = () => {
+				console.log("ready to rock");
+
+				formData.append("title", "title");
+				formData.append("body", "body");
+				formData.append("image", blob);
+
+				axios.put("http://127.0.0.1:8000/test/update/", formData);
+			};
+		</script>
+	</body>
+</html>
