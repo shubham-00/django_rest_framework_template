@@ -12,14 +12,17 @@ from django.contrib.auth import authenticate
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 class ApiBlogListView(ListAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = []
+    permission_classes = []
     pagination_class = PageNumberPagination
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["title", "body", "author__username"]
 
 
 @api_view(["GET"])
